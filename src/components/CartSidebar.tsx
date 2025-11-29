@@ -2,11 +2,54 @@
 
 import { useCart } from '@/contexts/CartContext';
 import CartItem from './CartItem';
+import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useShift } from '@/contexts/ShiftContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import ReceiptModal, { type ReceiptData } from './ReceiptModal';
 
 export default function CartSidebar() {
   const { cart, getSubtotal, getTax, getTotal, clearCart } = useCart();
+  const { user } = useAuth();
+  const { isShiftOpen, addSale } = useShift();
+  const { t } = useLanguage();
+  const [table, setTable] = useState('โต๊ะ 1');
+  const [receiptOpen, setReceiptOpen] = useState(false);
+  const [receiptData, setReceiptData] = useState<ReceiptData | null>(null);
+
+  const generateOrderNumber = () => {
+    const d = new Date();
+    const pad = (n: number, l = 2) => n.toString().padStart(l, '0');
+    return `#${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`;
+  };
+
+  const handleCheckout = () => {
+    if (cart.length === 0) return;
+    if (!isShiftOpen) {
+      alert(t('กรุณาเปิดกะก่อนทำรายการชำระเงิน', 'Please open a shift before checkout'));
+      return;
+    }
+    const subtotal = getSubtotal();
+    const tax = getTax();
+    const total = getTotal();
+    addSale(total);
+    const data: ReceiptData = {
+      orderNumber: generateOrderNumber(),
+      table,
+      cashier: user?.name || 'Unknown',
+      createdAt: new Date().toISOString(),
+      items: cart,
+      subtotal,
+      tax,
+      total,
+    };
+    setReceiptData(data);
+    setReceiptOpen(true);
+    clearCart();
+  };
 
   return (
+    <>
     <div className="w-96 bg-white border-l border-gray-200 flex flex-col h-screen fixed right-0 top-0 z-30 pt-[73px]">
       {/* Cart Header */}
       <div className="p-6 pb-4 border-b border-gray-200 bg-white">  
@@ -22,7 +65,11 @@ export default function CartSidebar() {
           </div>
         </div>
         <div className="relative">
-          <select className="w-full p-3 pr-10 border border-gray-200 rounded-lg appearance-none bg-white">
+          <select
+            value={table}
+            onChange={(e) => setTable(e.target.value)}
+            className="w-full p-3 pr-10 border border-gray-200 rounded-lg appearance-none bg-white"
+          >
             <option>โต๊ะ 1</option>
             <option>โต๊ะ 2</option>
             <option>โต๊ะ 3</option>
@@ -65,8 +112,8 @@ export default function CartSidebar() {
               <span className="text-orange-500">฿{getTotal().toFixed(2)}</span>
             </div>
           </div>
-          <button className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
-            <span>✓</span> ชำระเงิน
+          <button onClick={handleCheckout} className="w-full bg-orange-500 hover:bg-orange-600 text-white py-3 rounded-lg font-medium transition-colors flex items-center justify-center gap-2">
+            <span>✓</span> {t('ชำระเงิน', 'Checkout')}
           </button>
           <div className="flex gap-2 mt-2">
             <button className="flex-1 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">
@@ -79,5 +126,7 @@ export default function CartSidebar() {
         </div>
       )}
     </div>
+    <ReceiptModal isOpen={receiptOpen} onClose={() => setReceiptOpen(false)} data={receiptData} />
+    </>
   );
 }

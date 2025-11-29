@@ -53,7 +53,7 @@ export const permissionGroups: PermissionGroup[] = [
     labelTh: 'การเปิด/ปิดกะ',
     labelEn: 'Shift Control',
     items: [
-      { key: 'shift.open', labelTh: 'อนุญาตเปิดกะ', labelEn: 'Open shift', defaults: { admin: true } },
+      { key: 'shift.open', labelTh: 'อนุญาตเปิดกะ', labelEn: 'Open shift', defaults: { admin: true, staff: true } },
       { key: 'shift.close', labelTh: 'อนุญาตปิดกะ', labelEn: 'Close shift', defaults: { admin: true } },
     ],
   },

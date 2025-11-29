@@ -15,14 +15,16 @@ export default function ShiftModal({ isOpen, onClose }: ShiftModalProps) {
   const { currentShift, isShiftOpen, openShift, closeShift } = useShift();
   const { user } = useAuth();
   const { t } = useLanguage();
-  const { canCurrentAccess } = usePermissions();
+  const { canAccess, getUserRoles } = usePermissions();
   const [startingCash, setStartingCash] = useState('');
   const [endingCash, setEndingCash] = useState('');
 
   if (!isOpen) return null;
 
   const handleOpenShift = () => {
-    if (!canCurrentAccess('shift.open')) {
+    const userId = user?.id || 'anonymous';
+    const assigned = getUserRoles(userId, (user?.role ? [user.role as any] : undefined) as any);
+    if (!canAccess(userId, 'shift.open', assigned)) {
       alert(t('คุณไม่มีสิทธิ์เปิดกะ', 'You are not authorized to open shift'));
       return;
     }
@@ -36,7 +38,9 @@ export default function ShiftModal({ isOpen, onClose }: ShiftModalProps) {
   };
 
   const handleCloseShift = () => {
-    if (!canCurrentAccess('shift.close')) {
+    const userId = user?.id || 'anonymous';
+    const assigned = getUserRoles(userId, (user?.role ? [user.role as any] : undefined) as any);
+    if (!canAccess(userId, 'shift.close', assigned)) {
       alert(t('คุณไม่มีสิทธิ์ปิดกะ', 'You are not authorized to close shift'));
       return;
     }

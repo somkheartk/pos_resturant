@@ -25,7 +25,7 @@ interface PermissionContextType {
   canCurrentAccess: (key: string) => boolean;
 }
 
-const STORAGE_KEY = 'pos.permissions.v5';
+const STORAGE_KEY = 'pos.permissions.v6';
 
 const defaultRolePermissions = (): RolePermissions => {
   const initial: Partial<RolePermissions> = {};
@@ -51,7 +51,13 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      // Try current version
+      let raw = localStorage.getItem(STORAGE_KEY);
+      // Migrate from previous version if needed
+      if (!raw) {
+        const prev = localStorage.getItem('pos.permissions.v5');
+        if (prev) raw = prev;
+      }
       if (raw) {
         const parsed = JSON.parse(raw);
         // Merge saved permissions with new defaults to include any new permissions
@@ -60,6 +66,8 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
           Object.keys(parsed.rolePermissions).forEach((role) => {
             merged[role as Role] = { ...merged[role as Role], ...parsed.rolePermissions[role] };
           });
+          setRolePermissions(merged);
+        } else {
           setRolePermissions(merged);
         }
         if (parsed.userOverrides) setUserOverrides(parsed.userOverrides);
