@@ -4,6 +4,7 @@ import "./globals.css";
 import { CartProvider } from "@/contexts/CartContext";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 const kanit = Kanit({
   weight: ['300', '400', '500', '600', '700'],
@@ -28,9 +29,11 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <AuthProvider>
-          <SidebarProvider>
-            <CartProvider>{children}</CartProvider>
-          </SidebarProvider>
+          <LanguageProvider>
+            <SidebarProvider>
+              <CartProvider>{children}</CartProvider>
+            </SidebarProvider>
+          </LanguageProvider>
         </AuthProvider>
       </body>
     </html>

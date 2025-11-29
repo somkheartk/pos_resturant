@@ -7,11 +7,11 @@ export default function CartSidebar() {
   const { cart, getSubtotal, getTax, getTotal, clearCart } = useCart();
 
   return (
-    <div className="w-96 bg-white border-l border-gray-200 flex flex-col h-screen">
-      {/* Header */}
-      <div className="p-6 border-b border-gray-200">
+    <div className="w-96 bg-white border-l border-gray-200 flex flex-col h-screen fixed right-0 top-0 z-30 pt-[73px]">
+      {/* Cart Header */}
+      <div className="p-6 pb-4 border-b border-gray-200 bg-white">  
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">เมนูอาหาร</h2>
+          <h2 className="text-xl font-semibold">รายการสั่ง</h2>
           <div className="flex gap-2">
             <button className="p-2 hover:bg-gray-100 rounded">
               <span className="text-xl">🔍</span>
