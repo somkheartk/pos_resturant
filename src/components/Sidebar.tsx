@@ -1,39 +1,27 @@
-'use client';
+"use client";
 
 import { useSidebar } from '@/contexts/SidebarContext';
 import { useAuth } from '@/contexts/AuthContext';
+import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
-type Page = 'menu' | 'orders' | 'reports' | 'settings' | 'master';
-
-interface SidebarProps {
-  onNavigate: (page: Page) => void;
-  currentPage: Page;
-}
-
-export default function Sidebar({ onNavigate, currentPage }: SidebarProps) {
+export default function Sidebar() {
   const { isOpen, toggleSidebar } = useSidebar();
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const role = user?.role || 'staff';
 
   // เมนูตาม role
   const menuList = [
-    { key: 'orders', icon: '↻', label: 'รายการสั่งซื้อ' },
-    { key: 'menu', icon: '🍽️', label: 'เมนูอาหาร' },
+    { key: 'orders', icon: '↻', label: t('รายการสั่งซื้อ', 'Orders'), href: '/orders' },
+    { key: 'menu', icon: '🍽️', label: t('เมนูอาหาร', 'Menu'), href: '/' },
     ...(role === 'admin' ? [
-      { key: 'master', icon: '🗂️', label: 'จัดการเมนูอาหาร' },
-      { key: 'reports', icon: '📊', label: 'รายงาน' },
-      { key: 'settings', icon: '⚙', label: 'ตั้งค่า' },
+      { key: 'master', icon: '🗂️', label: t('จัดการเมนูอาหาร', 'Master Menu'), href: '/master' },
+      { key: 'reports', icon: '📊', label: t('รายงาน', 'Reports'), href: '/reports' },
+      { key: 'settings', icon: '⚙', label: t('ตั้งค่า', 'Settings'), href: '/settings' },
     ] : [])
   ];
-
-  const handleMenuClick = (page: Page) => {
-    onNavigate(page);
-    // Auto-close on mobile after clicking menu item
-    if (window.innerWidth < 1024 && isOpen) {
-      toggleSidebar();
-    }
-  };
 
   return (
     <>
@@ -75,16 +63,12 @@ export default function Sidebar({ onNavigate, currentPage }: SidebarProps) {
         {/* Menu Items */}
         <div className="flex-1 space-y-2">
           {menuList.map(menu => (
-            <button
-              key={menu.key}
-              onClick={() => handleMenuClick(menu.key as Page)}
-              className={`w-full flex items-center py-2.5 pr-4 text-white rounded-lg transition-colors ${currentPage === menu.key ? 'bg-blue-800' : 'hover:bg-blue-800'}`}
-            >
+            <Link href={menu.href} key={menu.key} className={`w-full flex items-center py-2.5 pr-4 text-white rounded-lg transition-colors hover:bg-blue-800`}>
               <div className="w-16 flex items-center justify-center flex-shrink-0">
                 <span className="text-xl">{menu.icon}</span>
               </div>
               <span className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${isOpen ? 'opacity-100 max-w-xs' : 'opacity-0 max-w-0'}`}>{menu.label}</span>
-            </button>
+            </Link>
           ))}
         </div>
 
@@ -102,10 +86,10 @@ export default function Sidebar({ onNavigate, currentPage }: SidebarProps) {
               isOpen ? 'opacity-100 max-w-xs' : 'opacity-0 max-w-0'
             }`}>
               <span className="text-sm font-medium whitespace-nowrap truncate">
-                {user?.name || 'ผู้ใช้งาน'}
+                {user?.name || t('ผู้ใช้งาน', 'User')}
               </span>
               <span className="text-xs text-gray-300 whitespace-nowrap">
-                {user?.role === 'admin' ? 'ผู้ดูแลระบบ' : 'พนักงาน'}
+                {user?.role === 'admin' ? t('ผู้ดูแลระบบ', 'Admin') : t('พนักงาน', 'Staff')}
               </span>
             </div>
           </div>
@@ -118,7 +102,7 @@ export default function Sidebar({ onNavigate, currentPage }: SidebarProps) {
             <div className="w-16 flex items-center justify-center flex-shrink-0">
               <span className="text-xl">🚪</span>
             </div>
-            <span className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${isOpen ? 'opacity-100 max-w-xs' : 'opacity-0 max-w-0'}`}>ออกจากระบบ</span>
+            <span className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${isOpen ? 'opacity-100 max-w-xs' : 'opacity-0 max-w-0'}`}>{t('ออกจากระบบ', 'Logout')}</span>
           </button>
         </div>
       </div>

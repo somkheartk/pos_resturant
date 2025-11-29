@@ -17,11 +17,8 @@ export const metadata: Metadata = {
   description: "ระบบจัดการร้านอาหาร Point of Sale",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="th" suppressHydrationWarning>
       <body
@@ -31,7 +28,9 @@ export default function RootLayout({
         <AuthProvider>
           <LanguageProvider>
             <SidebarProvider>
-              <CartProvider>{children}</CartProvider>
+              <CartProvider>
+                {children}
+              </CartProvider>
             </SidebarProvider>
           </LanguageProvider>
         </AuthProvider>

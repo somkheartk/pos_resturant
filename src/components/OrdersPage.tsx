@@ -1,8 +1,7 @@
-'use client';
-
 import { useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface Order {
   id: string;
@@ -20,114 +19,107 @@ interface Order {
 
 export default function OrdersPage() {
   const { user } = useAuth();
-  const [orders] = useState<Order[]>(
-    [
-      {
-        id: '1',
-        orderNumber: '#001',
-        table: 'โต๊ะ 1',
-        items: [
-          { name: 'ผัดไทย', quantity: 2, price: 120 },
-          { name: 'น้ำส้ม', quantity: 2, price: 45 },
-        ],
-        total: 330,
-        status: 'preparing',
-        createdAt: new Date(),
-      },
-      {
-        id: '2',
-        orderNumber: '#002',
-        table: 'โต๊ะ 3',
-        items: [
-          { name: 'ต้มยำกุ้ง', quantity: 1, price: 180 },
-          { name: 'ข้าวผัด', quantity: 1, price: 80 },
-        ],
-        total: 260,
-        status: 'ready',
-        createdAt: new Date(),
-      },
-      {
-        id: '3',
-        orderNumber: '#003',
-        table: 'โต๊ะ 2',
-        items: [
-          { name: 'แกงเขียวหวาน', quantity: 1, price: 150 },
-          { name: 'ข้าวขาหมู', quantity: 2, price: 90 },
-        ],
-        total: 330,
-        status: 'pending',
-        createdAt: new Date(),
-      },
-      {
-        id: '4',
-        orderNumber: '#004',
-        table: 'โต๊ะ 5',
-        items: [
-          { name: 'ข้าวผัดกุ้ง', quantity: 1, price: 100 },
-          { name: 'น้ำแตงโม', quantity: 1, price: 50 },
-        ],
-        total: 150,
-        status: 'completed',
-        createdAt: new Date(),
-      },
-      {
-        id: '5',
-        orderNumber: '#005',
-        table: 'โต๊ะ 4',
-        items: [
-          { name: 'ส้มตำ', quantity: 3, price: 60 },
-          { name: 'ปอเปี๊ยะทอด', quantity: 2, price: 70 },
-        ],
-        total: 320,
-        status: 'preparing',
-        createdAt: new Date(),
-      },
-      {
-        id: '6',
-        orderNumber: '#006',
-        table: 'โต๊ะ 2',
-        items: [
-          { name: 'ทอดมันปลา', quantity: 2, price: 65 },
-          { name: 'น้ำมะพร้าว', quantity: 1, price: 40 },
-        ],
-        total: 170,
-        status: 'ready',
-        createdAt: new Date(),
-      },
-      {
-        id: '7',
-        orderNumber: '#007',
-        table: 'โต๊ะ 1',
-        items: [
-          { name: 'ข้าวเหนียวมะม่วง', quantity: 1, price: 90 },
-          { name: 'น้ำมะนาว', quantity: 2, price: 30 },
-        ],
-        total: 150,
-        status: 'pending',
-        createdAt: new Date(),
-      },
-      {
-        id: '8',
-        orderNumber: '#008',
-        table: 'โต๊ะ 6',
-        items: [
-          { name: 'ขนมครก', quantity: 2, price: 35 },
-          { name: 'ไก่ทอด', quantity: 1, price: 80 },
-        ],
-        total: 150,
-        status: 'completed',
-        createdAt: new Date(),
-      },
-    ]
-  );
+  const { t } = useLanguage();
+  const [orders] = useState<Order[]>([
+    {
+      id: '1',
+      orderNumber: '#001',
+      table: 'โต๊ะ 1',
+      items: [
+        { name: 'ผัดไทย', quantity: 2, price: 120 },
+        { name: 'น้ำส้ม', quantity: 2, price: 45 },
+      ],
+      total: 330,
+      status: 'preparing',
+      createdAt: new Date(),
+    },
+    {
+      id: '2',
+      orderNumber: '#002',
+      table: 'โต๊ะ 3',
+      items: [
+        { name: 'ต้มยำกุ้ง', quantity: 1, price: 180 },
+        { name: 'ข้าวผัด', quantity: 1, price: 80 },
+      ],
+      total: 260,
+      status: 'ready',
+      createdAt: new Date(),
+    },
+    {
+      id: '3',
+      orderNumber: '#003',
+      table: 'โต๊ะ 2',
+      items: [
+        { name: 'แกงเขียวหวาน', quantity: 1, price: 150 },
+        { name: 'ข้าวขาหมู', quantity: 2, price: 90 },
+      ],
+      total: 330,
+      status: 'pending',
+      createdAt: new Date(),
+    },
+    {
+      id: '4',
+      orderNumber: '#004',
+      table: 'โต๊ะ 5',
+      items: [
+        { name: 'ข้าวผัดกุ้ง', quantity: 1, price: 100 },
+        { name: 'น้ำแตงโม', quantity: 1, price: 50 },
+      ],
+      total: 150,
+      status: 'completed',
+      createdAt: new Date(),
+    },
+    {
+      id: '5',
+      orderNumber: '#005',
+      table: 'โต๊ะ 4',
+      items: [
+        { name: 'ส้มตำ', quantity: 3, price: 60 },
+        { name: 'ปอเปี๊ยะทอด', quantity: 2, price: 70 },
+      ],
+      total: 320,
+      status: 'preparing',
+      createdAt: new Date(),
+    },
+    {
+      id: '6',
+      orderNumber: '#006',
+      table: 'โต๊ะ 2',
+      items: [
+        { name: 'ทอดมันปลา', quantity: 2, price: 65 },
+        { name: 'น้ำมะพร้าว', quantity: 1, price: 40 },
+      ],
+      total: 170,
+      status: 'ready',
+      createdAt: new Date(),
+    },
+    {
+      id: '7',
+      orderNumber: '#007',
+      table: 'โต๊ะ 1',
+      items: [
+        { name: 'ข้าวเหนียวมะม่วง', quantity: 1, price: 90 },
+        { name: 'น้ำมะนาว', quantity: 2, price: 30 },
+      ],
+      total: 150,
+      status: 'pending',
+      createdAt: new Date(),
+    },
+    {
+      id: '8',
+      orderNumber: '#008',
+      table: 'โต๊ะ 6',
+      items: [
+        { name: 'ขนมครก', quantity: 2, price: 35 },
+        { name: 'ไก่ทอด', quantity: 1, price: 80 },
+      ],
+      total: 150,
+      status: 'completed',
+      createdAt: new Date(),
+    },
+  ]);
   const [search, setSearch] = useState('');
   const [tableFilter, setTableFilter] = useState('ทั้งหมด');
-  const [role, setRole] = useState<'admin' | 'staff'>(user?.role || 'staff');
-
-  // เปลี่ยน role ใน context (mock)
-  const handleSwitchRole = () => {
-    setRole((prev) => (prev === 'admin' ? 'staff' : 'admin'));
-  };
 
   // สร้างรายการโต๊ะทั้งหมดจาก orders
   const tableList = Array.from(new Set(orders.map(o => o.table)));
@@ -158,13 +150,13 @@ export default function OrdersPage() {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'pending':
-        return 'รอดำเนินการ';
+        return t('รอดำเนินการ', 'Pending');
       case 'preparing':
-        return 'กำลังทำ';
+        return t('กำลังทำ', 'Preparing');
       case 'ready':
-        return 'พร้อมเสิร์ฟ';
+        return t('พร้อมเสิร์ฟ', 'Ready');
       case 'completed':
-        return 'เสร็จสิ้น';
+        return t('เสร็จสิ้น', 'Completed');
       default:
         return status;
     }
@@ -176,18 +168,12 @@ export default function OrdersPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-extrabold mb-2 text-blue-900 drop-shadow-sm">
-              รายการสั่งซื้อ
+              {t('รายการสั่งซื้อ', 'Orders')}
             </h1>
             <p className="text-lg font-medium text-gray-700 mb-4 flex items-center gap-2">
-              <span>🛒</span> จัดการออเดอร์ของลูกค้า
+              <span>🛒</span> {t('จัดการออเดอร์ของลูกค้า', 'Manage customer orders')}
             </p>
           </div>
-          <button
-            onClick={handleSwitchRole}
-            className="px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-semibold shadow transition-colors"
-          >
-            สลับบทบาท: {role === 'admin' ? 'ผู้ดูแลระบบ' : 'พนักงาน'}
-          </button>
         </div>
 
         <div className="flex flex-col md:flex-row gap-3 md:gap-4 items-stretch md:items-center">
@@ -197,7 +183,7 @@ export default function OrdersPage() {
               type="text"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="ค้นหาเลขออเดอร์ โต๊ะ หรือเมนู..."
+              placeholder={t('ค้นหาเลขออเดอร์ โต๊ะ หรือเมนู...', 'Search order number, table, or menu...')}
               className="bg-transparent outline-none w-full text-base text-gray-700"
             />
           </div>
@@ -208,7 +194,7 @@ export default function OrdersPage() {
               onChange={e => setTableFilter(e.target.value)}
               className="bg-transparent outline-none text-base text-gray-700 w-full"
             >
-              <option value="ทั้งหมด">โต๊ะทั้งหมด</option>
+              <option value="ทั้งหมด">{t('โต๊ะทั้งหมด', 'All tables')}</option>
               {tableList.map(table => (
                 <option key={table} value={table}>{table}</option>
               ))}
@@ -257,7 +243,7 @@ export default function OrdersPage() {
 
             <div className="border-t pt-4">
               <div className="flex justify-between items-center mb-4">
-                <span className="font-bold text-lg text-gray-700">ยอดรวม</span>
+                <span className="font-bold text-lg text-gray-700">{t('ยอดรวม', 'Total')}</span>
                 <span className="font-bold text-lg text-orange-500">
                   ฿{order.total.toFixed(2)}
                 </span>
@@ -265,10 +251,10 @@ export default function OrdersPage() {
 
               <div className="flex gap-2">
                 <button className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition-colors text-sm shadow">
-                  อัปเดตสถานะ
+                  {t('อัปเดตสถานะ', 'Update status')}
                 </button>
                 <button className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded-lg transition-colors text-sm shadow">
-                  ดูรายละเอียด
+                  {t('ดูรายละเอียด', 'View details')}
                 </button>
               </div>
             </div>
@@ -281,7 +267,7 @@ export default function OrdersPage() {
 
       {filteredOrders.length === 0 && (
         <div className="text-center py-20 text-gray-400">
-          <p className="text-xl">ไม่พบรายการสั่งซื้อ</p>
+          <p className="text-xl">{t('ไม่พบรายการสั่งซื้อ', 'No orders found')}</p>
         </div>
       )}
     </div>
