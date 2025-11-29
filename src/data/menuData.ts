@@ -97,7 +97,7 @@ export const menuItems: MenuItem[] = [
     name: 'ทอดมันปลา',
     description: 'ทอดมันปลากราย',
     price: 65,
-    image: 'https://images.unsplash.com/photo-1604908815604-2fb6082a0049?w=400&h=400&fit=crop',
+    image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=400&h=400&fit=crop',
     category: 'ของทานเล่น',
   },
   {
@@ -155,7 +155,7 @@ export const menuItems: MenuItem[] = [
     name: 'น้ำแตงโม',
     description: 'น้ำแตงโมปั่น',
     price: 50,
-    image: 'https://images.unsplash.com/photo-1587049352846-4a222e784l63?w=400&h=400&fit=crop',
+    image: 'https://images.unsplash.com/photo-1587049352846-4a222e784163?w=400&h=400&fit=crop',
     category: 'เครื่องดื่ม',
   },
   {
