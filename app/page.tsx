@@ -11,11 +11,12 @@ import OrdersPage from '@/components/OrdersPage';
 import ReportsPage from '@/components/ReportsPage';
 import SettingsPage from '@/components/SettingsPage';
 import Header from '@/components/Header';
+import MasterMenuPage from '@/components/MasterMenuPage';
 import { useSidebar } from '@/contexts/SidebarContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 
-type Page = 'menu' | 'orders' | 'reports' | 'settings';
+type Page = 'menu' | 'orders' | 'reports' | 'settings' | 'master';
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState('ทั้งหมด');
@@ -80,6 +81,7 @@ export default function Home() {
           {currentPage === 'orders' && <OrdersPage />}
           {currentPage === 'reports' && <ReportsPage />}
           {currentPage === 'settings' && <SettingsPage />}
+          {currentPage === 'master' && <MasterMenuPage />}
         </div>
       </div>
 

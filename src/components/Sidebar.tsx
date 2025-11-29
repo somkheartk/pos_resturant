@@ -4,7 +4,7 @@ import { useSidebar } from '@/contexts/SidebarContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useState, useEffect } from 'react';
 
-type Page = 'menu' | 'orders' | 'reports' | 'settings';
+type Page = 'menu' | 'orders' | 'reports' | 'settings' | 'master';
 
 interface SidebarProps {
   onNavigate: (page: Page) => void;
@@ -21,6 +21,7 @@ export default function Sidebar({ onNavigate, currentPage }: SidebarProps) {
     { key: 'orders', icon: '↻', label: 'รายการสั่งซื้อ' },
     { key: 'menu', icon: '🍽️', label: 'เมนูอาหาร' },
     ...(role === 'admin' ? [
+      { key: 'master', icon: '🗂️', label: 'จัดการเมนูอาหาร' },
       { key: 'reports', icon: '📊', label: 'รายงาน' },
       { key: 'settings', icon: '⚙', label: 'ตั้งค่า' },
     ] : [])
