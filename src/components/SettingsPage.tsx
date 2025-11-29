@@ -1,11 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useSearchParams } from 'next/navigation';
 
 export default function SettingsPage() {
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState('general');
+  const { t } = useLanguage();
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(tabParam || 'general');
+
+  useEffect(() => {
+    if (tabParam) setActiveTab(tabParam);
+  }, [tabParam]);
 
   return (
     <div className="p-8">
@@ -24,7 +33,7 @@ export default function SettingsPage() {
               : 'text-gray-600 hover:text-gray-800'
           }`}
         >
-          ทั่วไป
+          {t('ทั่วไป', 'General')}
         </button>
         <button
           onClick={() => setActiveTab('receipt')}
@@ -34,7 +43,7 @@ export default function SettingsPage() {
               : 'text-gray-600 hover:text-gray-800'
           }`}
         >
-          ใบเสร็จ
+          {t('ใบเสร็จ', 'Receipt')}
         </button>
         <button
           onClick={() => setActiveTab('users')}
@@ -44,7 +53,7 @@ export default function SettingsPage() {
               : 'text-gray-600 hover:text-gray-800'
           }`}
         >
-          ผู้ใช้งาน
+          {t('ผู้ใช้งาน', 'Users')}
         </button>
       </div>
 

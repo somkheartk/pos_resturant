@@ -3,13 +3,19 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSidebar } from '@/contexts/SidebarContext';
+import { useShift } from '@/contexts/ShiftContext';
+import { usePermissions } from '@/contexts/PermissionContext';
 import { useRef, useState, useEffect } from 'react';
+import ShiftModal from './ShiftModal';
 
 export default function Header() {
   const { user, setRole } = useAuth();
   const { language, toggleLanguage, t } = useLanguage();
   const { toggleSidebar, isOpen } = useSidebar();
+  const { isShiftOpen, currentShift } = useShift();
+  const { canCurrentAccess } = usePermissions();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [shiftModalOpen, setShiftModalOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   // ปิดเมนูเมื่อคลิกนอกเมนู
@@ -68,6 +74,23 @@ export default function Header() {
 
       {/* Right Section */}
       <div className="flex items-center gap-3">
+        {/* Shift Status & Control */}
+        {(isShiftOpen ? canCurrentAccess('shift.close') : canCurrentAccess('shift.open')) && (
+          <button
+            onClick={() => setShiftModalOpen(true)}
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors font-medium text-sm ${
+              isShiftOpen
+                ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+            }`}
+          >
+            <span className="text-lg">{isShiftOpen ? '🟢' : '⚪'}</span>
+            <span className="hidden sm:inline">
+              {isShiftOpen ? t('ปิดกะ', 'Close Shift') : t('เปิดกะ', 'Open Shift')}
+            </span>
+          </button>
+        )}
+
         {/* Language Toggle */}
         <button
           onClick={toggleLanguage}
@@ -117,6 +140,9 @@ export default function Header() {
           )}
         </div>
       </div>
+
+      {/* Shift Modal */}
+      <ShiftModal isOpen={shiftModalOpen} onClose={() => setShiftModalOpen(false)} />
     </header>
   );
 }

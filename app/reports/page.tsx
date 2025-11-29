@@ -11,7 +11,7 @@ import { useSidebar } from '@/contexts/SidebarContext';
 
 export default function ReportsRoute() {
   const { isAuthenticated } = useAuth();
-  const { cartItems } = useCart();
+  const { cart } = useCart();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const { t } = useLanguage();
   const { isOpen } = useSidebar();
@@ -30,7 +30,7 @@ export default function ReportsRoute() {
           <ReportsPage />
         </main>
         {/* Cart Toggle Button */}
-        {cartItems && cartItems.length > 0 && (
+        {cart && cart.length > 0 && (
           <button
             className="absolute bottom-8 right-8 z-30 bg-orange-500 text-white px-4 py-2 rounded-full shadow-lg hover:bg-orange-600 transition-all"
             onClick={() => setIsCartOpen((open) => !open)}
@@ -41,20 +41,20 @@ export default function ReportsRoute() {
         {/* Slide-in Cart Panel */}
         <div className="flex">
           <div className="flex-1" />
-          {cartItems && cartItems.length > 0 && (
+          {cart && cart.length > 0 && (
             <div
-              className={`h-[calc(100vh-4rem)] w-80 bg-white shadow-2xl z-20 absolute top-8 right-8 transition-transform duration-300 ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}`}
+              className={`h-[calc(100vh-4rem)] w-80 bg-white rounded-2xl border border-gray-100 shadow-2xl z-20 absolute top-8 right-8 transition-transform duration-300 ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}`}
               style={{ maxHeight: 'calc(100vh - 4rem)' }}
             >
-              <div className="flex items-center justify-between px-6 py-4 border-b">
-                <h2 className="text-lg font-bold text-orange-600">{t('รายการสินค้า', 'Cart Items')}</h2>
+              <div className="flex items-center justify-between px-6 py-3 bg-blue-50/70 border-b rounded-t-2xl">
+                <h2 className="text-base font-semibold text-blue-900">{t('รายการสินค้า', 'Cart Items')}</h2>
                 <button
                   className="text-gray-400 hover:text-gray-700 text-2xl"
                   onClick={() => setIsCartOpen(false)}
                 >×</button>
               </div>
-              <div className="p-6 space-y-4 overflow-y-auto h-[calc(100%-64px)]">
-                {cartItems.map((item, idx) => (
+              <div className="p-6 space-y-4 overflow-y-auto h-[calc(100%-60px)]">
+                {cart.map((item, idx) => (
                   <div key={idx} className="flex justify-between items-center border-b pb-2">
                     <div>
                       <div className="font-semibold text-gray-800">{item.name}</div>
@@ -64,7 +64,7 @@ export default function ReportsRoute() {
                   </div>
                 ))}
                 <div className="pt-4 border-t font-bold text-lg text-right text-orange-600">
-                  {t('รวม', 'Total')}: ฿{cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}
+                  {t('รวม', 'Total')}: ฿{cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}
                 </div>
               </div>
             </div>

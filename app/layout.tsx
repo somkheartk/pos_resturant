@@ -5,6 +5,8 @@ import { CartProvider } from "@/contexts/CartContext";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { PermissionProvider } from "@/contexts/PermissionContext";
+import { ShiftProvider } from "@/contexts/ShiftContext";
 
 const kanit = Kanit({
   weight: ['300', '400', '500', '600', '700'],
@@ -26,13 +28,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         suppressHydrationWarning
       >
         <AuthProvider>
-          <LanguageProvider>
-            <SidebarProvider>
-              <CartProvider>
-                {children}
-              </CartProvider>
-            </SidebarProvider>
-          </LanguageProvider>
+          <PermissionProvider>
+            <LanguageProvider>
+              <SidebarProvider>
+                <CartProvider>
+                  <ShiftProvider>
+                    {children}
+                  </ShiftProvider>
+                </CartProvider>
+              </SidebarProvider>
+            </LanguageProvider>
+          </PermissionProvider>
         </AuthProvider>
       </body>
     </html>
