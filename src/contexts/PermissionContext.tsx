@@ -190,6 +190,15 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // API methods to accept branchId and manage permissions
+  function getUserRolesByBranch(branchId: string) {
+    // logic to get user roles by branch
+  }
+
+  function getUserOverridesByBranch(branchId: string) {
+    // logic to get user overrides by branch
+  }
+
   const value = useMemo(
     () => ({
       getRolePermissions,
