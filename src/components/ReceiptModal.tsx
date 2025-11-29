@@ -3,6 +3,7 @@
 import React, { useMemo, useState } from 'react';
 import { CartItem } from '@/types/menu';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useBranch } from '@/contexts/BranchContext';
 
 export interface ReceiptData {
   orderNumber: string;
@@ -25,6 +26,7 @@ export default function ReceiptModal({
   data: ReceiptData | null;
 }) {
   const { t } = useLanguage();
+  const { currentBranch } = useBranch();
   if (!isOpen || !data) return null;
 
   const [paymentMethod, setPaymentMethod] = useState<'cash' | 'card' | 'qr'>('cash');
@@ -74,8 +76,8 @@ export default function ReceiptModal({
         </head>
         <body>
           <h1>POS RESTAURANT</h1>
-          <div class="center" style="font-size:12px">${t('สาขาหลัก', 'Main Branch')}</div>
-          <div class="center muted" style="font-size:12px">VAT: 0105551234567</div>
+          <div class="center" style="font-size:12px">${currentBranch?.name || t('สาขาหลัก','Main Branch')}</div>
+          ${currentBranch?.taxId ? `<div class="center muted" style="font-size:12px">VAT: ${currentBranch.taxId}</div>` : ''}
           <div class="center" style="font-size:12px; margin-top:4px;">${t('ใบกำกับภาษีอย่างย่อ', 'ABB TAX INVOICE')}</div>
           <hr/>
           <div class="row"><span>${t('เลขที่บิล', 'Order No.')}</span><span>${data.orderNumber}</span></div>
@@ -118,7 +120,7 @@ export default function ReceiptModal({
             {/* Brand header */}
             <div className="bg-gradient-to-r from-orange-50 to-blue-50 border border-orange-100 rounded-xl p-4 text-center shadow-sm">
               <div className="text-xl font-extrabold text-blue-900 tracking-wide">POS RESTAURANT</div>
-              <div className="text-xs text-gray-600">{t('สาขาหลัก', 'Main Branch')} · VAT: 0105551234567</div>
+              <div className="text-xs text-gray-600">{currentBranch?.name || t('สาขาหลัก','Main Branch')}{currentBranch?.taxId ? ` · VAT: ${currentBranch.taxId}` : ''}</div>
               <div className="inline-flex items-center gap-2 text-[11px] text-orange-700 bg-orange-50 border border-orange-100 px-2 py-0.5 rounded-full mt-2">
                 <span>🧾</span>
                 <span>{t('ใบกำกับภาษีอย่างย่อ', 'ABB TAX INVOICE')}</span>

@@ -4,9 +4,9 @@ import { createContext, useContext, useEffect, useMemo, useState, ReactNode } fr
 import { permissionGroups, roles, type Role } from '@/config/permissions';
 
 export type PermissionMap = Record<string, boolean>;
-export type UserPermissionsOverrides = Record<string, PermissionMap>;
+export type UserPermissionsOverridesByBranch = Record<string, Record<string, PermissionMap>>; // userId -> branchId -> perms
 export type RolePermissions = Record<Role, PermissionMap>;
-export type UserRolesMap = Record<string, Role[]>;
+export type UserRolesByBranch = Record<string, Record<string, Role[]>>; // userId -> branchId -> roles
 
 interface PermissionContextType {
   // Role-level permissions
@@ -14,18 +14,18 @@ interface PermissionContextType {
   setRolePermission: (role: Role, key: string, value: boolean) => void;
 
   // User-level roles and overrides
-  getUserRoles: (userId: string, fallbackRoles?: Role[]) => Role[];
-  setUserRoles: (userId: string, roles: Role[]) => void;
-  toggleUserRole: (userId: string, role: Role) => void;
-  getUserPermissions: (userId: string, role?: Role) => PermissionMap; // role param kept for backward compat
-  setPermission: (userId: string, key: string, value: boolean) => void;
+  getUserRoles: (userId: string, fallbackRoles?: Role[], branchId?: string) => Role[];
+  setUserRoles: (userId: string, roles: Role[], branchId?: string) => void;
+  toggleUserRole: (userId: string, role: Role, branchId?: string) => void;
+  getUserPermissions: (userId: string, role?: Role, branchId?: string) => PermissionMap; // role param kept for backward compat
+  setPermission: (userId: string, key: string, value: boolean, branchId?: string) => void;
 
   // Access checks
-  canAccess: (userId: string, key: string, roles?: Role[] | Role) => boolean;
+  canAccess: (userId: string, key: string, roles?: Role[] | Role, branchId?: string) => boolean;
   canCurrentAccess: (key: string) => boolean;
 }
 
-const STORAGE_KEY = 'pos.permissions.v6';
+const STORAGE_KEY = 'pos.permissions.v7';
 
 const defaultRolePermissions = (): RolePermissions => {
   const initial: Partial<RolePermissions> = {};
@@ -46,17 +46,17 @@ const PermissionContext = createContext<PermissionContextType | undefined>(undef
 
 export function PermissionProvider({ children }: { children: ReactNode }) {
   const [rolePermissions, setRolePermissions] = useState<RolePermissions>(() => defaultRolePermissions());
-  const [userOverrides, setUserOverrides] = useState<UserPermissionsOverrides>({});
-  const [userRoles, setUserRolesState] = useState<UserRolesMap>({});
+  const [userOverrides, setUserOverrides] = useState<UserPermissionsOverridesByBranch>({});
+  const [userRoles, setUserRolesState] = useState<UserRolesByBranch>({});
 
   useEffect(() => {
     try {
       // Try current version
       let raw = localStorage.getItem(STORAGE_KEY);
-      // Migrate from previous version if needed
+      // Migrate from previous versions if needed (v6 -> v7)
       if (!raw) {
-        const prev = localStorage.getItem('pos.permissions.v5');
-        if (prev) raw = prev;
+        const prev6 = localStorage.getItem('pos.permissions.v6');
+        if (prev6) raw = prev6;
       }
       if (raw) {
         const parsed = JSON.parse(raw);
@@ -70,8 +70,25 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
         } else {
           setRolePermissions(merged);
         }
-        if (parsed.userOverrides) setUserOverrides(parsed.userOverrides);
-        if (parsed.userRoles) setUserRolesState(parsed.userRoles);
+        // v7 stores overrides/roles per branch; migrate if flat
+        if (parsed.userOverrides && !parsed.userOverridesByBranch) {
+          const byBranch: UserPermissionsOverridesByBranch = {};
+          Object.keys(parsed.userOverrides as Record<string, PermissionMap>).forEach((uid) => {
+            byBranch[uid] = { main: parsed.userOverrides[uid] };
+          });
+          setUserOverrides(byBranch);
+        } else if (parsed.userOverridesByBranch) {
+          setUserOverrides(parsed.userOverridesByBranch);
+        }
+        if (parsed.userRoles && !parsed.userRolesByBranch) {
+          const byBranch: UserRolesByBranch = {};
+          Object.keys(parsed.userRoles as Record<string, Role[]>).forEach((uid) => {
+            byBranch[uid] = { main: parsed.userRoles[uid] };
+          });
+          setUserRolesState(byBranch);
+        } else if (parsed.userRolesByBranch) {
+          setUserRolesState(parsed.userRolesByBranch);
+        }
       }
     } catch {}
   }, []);
@@ -80,7 +97,7 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
     try {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ rolePermissions, userOverrides, userRoles })
+        JSON.stringify({ rolePermissions, userOverridesByBranch: userOverrides, userRolesByBranch: userRoles })
       );
     } catch {}
   }, [rolePermissions, userOverrides, userRoles]);
@@ -96,27 +113,28 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  const getUserRoles = (userId: string, fallback: Role[] = ['staff' as Role]): Role[] => {
-    const saved = userRoles[userId];
+  const getUserRoles = (userId: string, fallback: Role[] = ['staff' as Role], branchId = 'main'): Role[] => {
+    const saved = userRoles[userId]?.[branchId];
     return saved && saved.length ? saved : fallback;
   };
 
-  const setUserRoles = (userId: string, rolesArr: Role[]) => {
-    setUserRolesState((prev) => ({ ...prev, [userId]: rolesArr }));
+  const setUserRoles = (userId: string, rolesArr: Role[], branchId = 'main') => {
+    setUserRolesState((prev) => ({ ...prev, [userId]: { ...(prev[userId] ?? {}), [branchId]: rolesArr } }));
   };
 
-  const toggleUserRole = (userId: string, role: Role) => {
+  const toggleUserRole = (userId: string, role: Role, branchId = 'main') => {
     setUserRolesState((prev) => {
-      const current = new Set(prev[userId] ?? []);
+      const list = prev[userId]?.[branchId] ?? [];
+      const current = new Set(list);
       if (current.has(role)) current.delete(role);
       else current.add(role);
-      return { ...prev, [userId]: Array.from(current) };
+      return { ...prev, [userId]: { ...(prev[userId] ?? {}), [branchId]: Array.from(current) } };
     });
   };
 
-  const getUserPermissions = (userId: string, maybeRole?: Role): PermissionMap => {
+  const getUserPermissions = (userId: string, maybeRole?: Role, branchId = 'main'): PermissionMap => {
     // Back-compat: if maybeRole provided and no saved roles, use it as fallback
-    const assigned = getUserRoles(userId, maybeRole ? [maybeRole] : undefined);
+    const assigned = getUserRoles(userId, maybeRole ? [maybeRole] : undefined, branchId);
     // Union across roles
     const base: PermissionMap = {};
     assigned.forEach((r) => {
@@ -126,26 +144,27 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
       });
     });
     // Apply per-user overrides
-    const overrides = userOverrides[userId] ?? {};
+    const overrides = userOverrides[userId]?.[branchId] ?? {};
     const result = { ...base, ...overrides };
-    console.log('PermissionContext getUserPermissions:', { userId, assigned, base, overrides, result });
+    console.log('PermissionContext getUserPermissions:', { userId, branchId, assigned, base, overrides, result });
     return result;
   };
 
-  const setPermission = (userId: string, key: string, value: boolean) => {
+  const setPermission = (userId: string, key: string, value: boolean, branchId = 'main') => {
     setUserOverrides((prev) => {
-      const current = prev[userId] ?? {};
-      return { ...prev, [userId]: { ...current, [key]: value } };
+      const currentForUser = prev[userId] ?? {};
+      const current = currentForUser[branchId] ?? {};
+      return { ...prev, [userId]: { ...currentForUser, [branchId]: { ...current, [key]: value } } };
     });
   };
 
-  const canAccess = (userId: string, key: string, roleOrRoles?: Role[] | Role) => {
+  const canAccess = (userId: string, key: string, roleOrRoles?: Role[] | Role, branchId = 'main') => {
     const rolesArr = Array.isArray(roleOrRoles)
       ? roleOrRoles
       : roleOrRoles
       ? [roleOrRoles]
       : undefined;
-    const p = getUserPermissions(userId, rolesArr && rolesArr[0]);
+    const p = getUserPermissions(userId, rolesArr && rolesArr[0], branchId);
     return !!p[key];
   };
 
@@ -154,15 +173,17 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
     try {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const { useAuth } = require('./AuthContext');
+      const { useBranch } = require('./BranchContext');
       const { user } = useAuth();
+      const { currentBranchId } = useBranch();
       const userId = user?.id ?? 'anonymous';
       const rolesFromAuth: Role[] | undefined = Array.isArray(user?.roles)
         ? (user.roles as Role[])
         : user?.role
         ? [user.role as Role]
         : undefined;
-      const assigned = getUserRoles(userId, rolesFromAuth ?? ['staff' as Role]);
-      const p = getUserPermissions(userId, assigned[0]);
+      const assigned = getUserRoles(userId, rolesFromAuth ?? ['staff' as Role], currentBranchId ?? 'main');
+      const p = getUserPermissions(userId, assigned[0], currentBranchId ?? 'main');
       return !!p[key];
     } catch {
       return false;

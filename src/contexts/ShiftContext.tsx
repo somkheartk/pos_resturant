@@ -8,12 +8,13 @@ interface Shift {
   openedAt: string;
   startingCash: number;
   sales: number;
+  branchId?: string;
 }
 
 interface ShiftContextType {
   currentShift: Shift | null;
   isShiftOpen: boolean;
-  openShift: (startingCash: number, userName: string, userId: string) => void;
+  openShift: (startingCash: number, userName: string, userId: string, branchId?: string) => void;
   closeShift: (endingCash: number) => { difference: number; expected: number; actual: number };
   addSale: (amount: number) => void;
 }
@@ -42,13 +43,14 @@ export function ShiftProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [currentShift]);
 
-  const openShift = (startingCash: number, userName: string, userId: string) => {
+  const openShift = (startingCash: number, userName: string, userId: string, branchId?: string) => {
     setCurrentShift({
       userId,
       userName,
       openedAt: new Date().toISOString(),
       startingCash,
       sales: 0,
+      branchId,
     });
   };
 

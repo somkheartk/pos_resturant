@@ -5,6 +5,7 @@ import { useShift } from '@/contexts/ShiftContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePermissions } from '@/contexts/PermissionContext';
+import { useBranch } from '@/contexts/BranchContext';
 
 interface ShiftModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ export default function ShiftModal({ isOpen, onClose }: ShiftModalProps) {
   const { user } = useAuth();
   const { t } = useLanguage();
   const { canAccess, getUserRoles } = usePermissions();
+  const { currentBranchId } = useBranch();
   const [startingCash, setStartingCash] = useState('');
   const [endingCash, setEndingCash] = useState('');
 
@@ -23,8 +25,8 @@ export default function ShiftModal({ isOpen, onClose }: ShiftModalProps) {
 
   const handleOpenShift = () => {
     const userId = user?.id || 'anonymous';
-    const assigned = getUserRoles(userId, (user?.role ? [user.role as any] : undefined) as any);
-    if (!canAccess(userId, 'shift.open', assigned)) {
+    const assigned = getUserRoles(userId, (user?.role ? [user.role as any] : undefined) as any, currentBranchId);
+    if (!canAccess(userId, 'shift.open', assigned, currentBranchId)) {
       alert(t('คุณไม่มีสิทธิ์เปิดกะ', 'You are not authorized to open shift'));
       return;
     }
@@ -32,15 +34,15 @@ export default function ShiftModal({ isOpen, onClose }: ShiftModalProps) {
       alert(t('กรุณาระบุเงินทอนเริ่มต้น', 'Please enter starting cash'));
       return;
     }
-    openShift(parseFloat(startingCash), user?.name || 'Unknown', user?.id || 'anonymous');
+    openShift(parseFloat(startingCash), user?.name || 'Unknown', user?.id || 'anonymous', currentBranchId);
     setStartingCash('');
     onClose();
   };
 
   const handleCloseShift = () => {
     const userId = user?.id || 'anonymous';
-    const assigned = getUserRoles(userId, (user?.role ? [user.role as any] : undefined) as any);
-    if (!canAccess(userId, 'shift.close', assigned)) {
+    const assigned = getUserRoles(userId, (user?.role ? [user.role as any] : undefined) as any, currentBranchId);
+    if (!canAccess(userId, 'shift.close', assigned, currentBranchId)) {
       alert(t('คุณไม่มีสิทธิ์ปิดกะ', 'You are not authorized to close shift'));
       return;
     }

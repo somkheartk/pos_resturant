@@ -7,6 +7,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { PermissionProvider } from "@/contexts/PermissionContext";
 import { ShiftProvider } from "@/contexts/ShiftContext";
+import { BranchProvider } from "@/contexts/BranchContext";
 
 const kanit = Kanit({
   weight: ['300', '400', '500', '600', '700'],
@@ -30,13 +31,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthProvider>
           <PermissionProvider>
             <LanguageProvider>
-              <SidebarProvider>
-                <CartProvider>
-                  <ShiftProvider>
-                    {children}
-                  </ShiftProvider>
-                </CartProvider>
-              </SidebarProvider>
+              <BranchProvider>
+                <SidebarProvider>
+                  <CartProvider>
+                    <ShiftProvider>
+                      {children}
+                    </ShiftProvider>
+                  </CartProvider>
+                </SidebarProvider>
+              </BranchProvider>
             </LanguageProvider>
           </PermissionProvider>
         </AuthProvider>

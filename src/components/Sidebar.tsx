@@ -7,21 +7,25 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { usePermissions } from '@/contexts/PermissionContext';
+import { useBranch } from '@/contexts/BranchContext';
 
 export default function Sidebar() {
   const { isOpen, toggleSidebar } = useSidebar();
   const { user, logout } = useAuth();
   const { t } = useLanguage();
   const { getUserPermissions, getUserRoles } = usePermissions();
+  const { currentBranchId } = useBranch();
   const pathname = usePathname();
   // Ensure permissions use the current auth role as fallback, not default staff
   const userRoles = getUserRoles(
     user?.id || 'anonymous',
-    (user as any)?.roles || (user?.role ? [user.role] : ['staff'])
+    (user as any)?.roles || (user?.role ? [user.role] : ['staff']),
+    currentBranchId
   );
   const userPerms = getUserPermissions(
     user?.id || 'anonymous',
-    (Array.isArray((user as any)?.roles) ? (user as any)?.roles?.[0] : (user?.role as any))
+    (Array.isArray((user as any)?.roles) ? (user as any)?.roles?.[0] : (user?.role as any)),
+    currentBranchId
   );
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 

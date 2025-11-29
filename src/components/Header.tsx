@@ -5,6 +5,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useSidebar } from '@/contexts/SidebarContext';
 import { useShift } from '@/contexts/ShiftContext';
 import { usePermissions } from '@/contexts/PermissionContext';
+import { useBranch } from '@/contexts/BranchContext';
 import { useRef, useState, useEffect } from 'react';
 import ShiftModal from './ShiftModal';
 
@@ -14,6 +15,7 @@ export default function Header() {
   const { toggleSidebar, isOpen } = useSidebar();
   const { isShiftOpen, currentShift } = useShift();
   const { canCurrentAccess } = usePermissions();
+  const { branches, currentBranchId, setCurrentBranch } = useBranch();
   const [menuOpen, setMenuOpen] = useState(false);
   const [shiftModalOpen, setShiftModalOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -74,6 +76,19 @@ export default function Header() {
 
       {/* Right Section */}
       <div className="flex items-center gap-3">
+        {/* Branch Switcher */}
+        <div className="hidden sm:flex items-center gap-2 mr-1">
+          <span className="text-xs text-gray-500">สาขา</span>
+          <select
+            value={currentBranchId}
+            onChange={(e) => setCurrentBranch(e.target.value)}
+            className="text-sm border border-gray-200 rounded-lg px-2 py-1 bg-white hover:border-gray-300"
+          >
+            {branches.map(b => (
+              <option key={b.id} value={b.id}>{b.name}</option>
+            ))}
+          </select>
+        </div>
         {/* Shift Status & Control */}
         {(isShiftOpen ? canCurrentAccess('shift.close') : canCurrentAccess('shift.open')) && (
           <button
