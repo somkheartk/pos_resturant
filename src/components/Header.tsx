@@ -3,11 +3,34 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useSidebar } from '@/contexts/SidebarContext';
+import { useRef, useState, useEffect } from 'react';
 
 export default function Header() {
-  const { user } = useAuth();
+  const { user, setRole } = useAuth();
   const { language, toggleLanguage, t } = useLanguage();
   const { toggleSidebar, isOpen } = useSidebar();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // ปิดเมนูเมื่อคลิกนอกเมนู
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+    if (menuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [menuOpen]);
+
+  const handleSelectRole = (r: 'admin' | 'staff') => {
+    setRole(r);
+    setMenuOpen(false);
+  };
 
   return (
     <header 
@@ -63,18 +86,35 @@ export default function Header() {
         </button>
 
         {/* User Info */}
-        <div className="flex items-center gap-3 pl-3 border-l border-gray-200">
-          <div className="hidden sm:block text-right">
-            <p className="text-sm font-medium">{user?.name}</p>
-            <p className="text-xs text-gray-500">
-              {user?.role === 'admin'
-                ? t('ผู้ดูแลระบบ', 'Admin')
-                : t('พนักงาน', 'Staff')}
-            </p>
+        <div className="relative" ref={menuRef}>
+          <div
+            className="flex items-center gap-3 pl-3 border-l border-gray-200 cursor-pointer select-none"
+            onClick={() => setMenuOpen((open) => !open)}
+          >
+            <div className="hidden sm:block text-right">
+              <p className="text-sm font-medium">{user?.name}</p>
+              <p className="text-xs text-gray-500">
+                {user?.role === 'admin'
+                  ? t('ผู้ดูแลระบบ', 'Admin')
+                  : t('พนักงาน', 'Staff')}
+              </p>
+            </div>
+            <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-semibold">
+              {user?.name?.charAt(0).toUpperCase() || 'U'}
+            </div>
           </div>
-          <div className="w-10 h-10 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center text-white font-semibold">
-            {user?.name?.charAt(0).toUpperCase() || 'U'}
-          </div>
+          {menuOpen && (
+            <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+              <button
+                onClick={() => handleSelectRole('admin')}
+                className={`w-full text-left px-4 py-2 hover:bg-orange-50 rounded-lg ${user?.role === 'admin' ? 'bg-orange-100 font-bold text-orange-600' : ''}`}
+              >ผู้ดูแลระบบ</button>
+              <button
+                onClick={() => handleSelectRole('staff')}
+                className={`w-full text-left px-4 py-2 hover:bg-orange-50 rounded-lg ${user?.role === 'staff' ? 'bg-orange-100 font-bold text-orange-600' : ''}`}
+              >พนักงาน</button>
+            </div>
+          )}
         </div>
       </div>
     </header>

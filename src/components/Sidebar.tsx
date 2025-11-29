@@ -2,6 +2,7 @@
 
 import { useSidebar } from '@/contexts/SidebarContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useState, useEffect } from 'react';
 
 type Page = 'menu' | 'orders' | 'reports' | 'settings';
 
@@ -13,6 +14,17 @@ interface SidebarProps {
 export default function Sidebar({ onNavigate, currentPage }: SidebarProps) {
   const { isOpen, toggleSidebar } = useSidebar();
   const { user, logout } = useAuth();
+  const role = user?.role || 'staff';
+
+  // เมนูตาม role
+  const menuList = [
+    { key: 'orders', icon: '↻', label: 'รายการสั่งซื้อ' },
+    { key: 'menu', icon: '🍽️', label: 'เมนูอาหาร' },
+    ...(role === 'admin' ? [
+      { key: 'reports', icon: '📊', label: 'รายงาน' },
+      { key: 'settings', icon: '⚙', label: 'ตั้งค่า' },
+    ] : [])
+  ];
 
   const handleMenuClick = (page: Page) => {
     onNavigate(page);
@@ -61,53 +73,18 @@ export default function Sidebar({ onNavigate, currentPage }: SidebarProps) {
 
         {/* Menu Items */}
         <div className="flex-1 space-y-2">
-          <button
-            onClick={() => handleMenuClick('orders')}
-            className={`w-full flex items-center py-2.5 pr-4 text-white rounded-lg transition-colors ${
-              currentPage === 'orders' ? 'bg-blue-800' : 'hover:bg-blue-800'
-            }`}
-          >
-            <div className="w-16 flex items-center justify-center flex-shrink-0">
-              <span className="text-xl">↻</span>
-            </div>
-            <span className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${isOpen ? 'opacity-100 max-w-xs' : 'opacity-0 max-w-0'}`}>รายการสั่งซื้อ</span>
-          </button>
-
-          <button
-            onClick={() => handleMenuClick('reports')}
-            className={`w-full flex items-center py-2.5 pr-4 text-white rounded-lg transition-colors ${
-              currentPage === 'reports' ? 'bg-blue-800' : 'hover:bg-blue-800'
-            }`}
-          >
-            <div className="w-16 flex items-center justify-center flex-shrink-0">
-              <span className="text-xl">📊</span>
-            </div>
-            <span className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${isOpen ? 'opacity-100 max-w-xs' : 'opacity-0 max-w-0'}`}>รายงาน</span>
-          </button>
-
-          <button
-            onClick={() => handleMenuClick('settings')}
-            className={`w-full flex items-center py-2.5 pr-4 text-white rounded-lg transition-colors ${
-              currentPage === 'settings' ? 'bg-blue-800' : 'hover:bg-blue-800'
-            }`}
-          >
-            <div className="w-16 flex items-center justify-center flex-shrink-0">
-              <span className="text-xl">⚙</span>
-            </div>
-            <span className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${isOpen ? 'opacity-100 max-w-xs' : 'opacity-0 max-w-0'}`}>ตั้งค่า</span>
-          </button>
-
-          <button
-            onClick={() => handleMenuClick('menu')}
-            className={`w-full flex items-center py-2.5 pr-4 text-white rounded-lg transition-colors ${
-              currentPage === 'menu' ? 'bg-blue-800' : 'hover:bg-blue-800'
-            }`}
-          >
-            <div className="w-16 flex items-center justify-center flex-shrink-0">
-              <span className="text-xl">🍽️</span>
-            </div>
-            <span className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${isOpen ? 'opacity-100 max-w-xs' : 'opacity-0 max-w-0'}`}>เมนูอาหาร</span>
-          </button>
+          {menuList.map(menu => (
+            <button
+              key={menu.key}
+              onClick={() => handleMenuClick(menu.key as Page)}
+              className={`w-full flex items-center py-2.5 pr-4 text-white rounded-lg transition-colors ${currentPage === menu.key ? 'bg-blue-800' : 'hover:bg-blue-800'}`}
+            >
+              <div className="w-16 flex items-center justify-center flex-shrink-0">
+                <span className="text-xl">{menu.icon}</span>
+              </div>
+              <span className={`whitespace-nowrap overflow-hidden transition-all duration-300 ${isOpen ? 'opacity-100 max-w-xs' : 'opacity-0 max-w-0'}`}>{menu.label}</span>
+            </button>
+          ))}
         </div>
 
         {/* User Section */}
