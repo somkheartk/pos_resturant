@@ -191,11 +191,11 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
   };
 
   // API methods to accept branchId and manage permissions
-  function getUserRolesByBranch(branchId: string) {
+  function getUserRolesByBranch(userId: string, branchId: string) {
     // logic to get user roles by branch
   }
 
-  function getUserOverridesByBranch(branchId: string) {
+  function getUserOverridesByBranch(userId: string, branchId: string) {
     // logic to get user overrides by branch
   }
 

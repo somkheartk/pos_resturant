@@ -28,10 +28,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         className={`${kanit.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
-        <AuthProvider>
-          <PermissionProvider>
-            <LanguageProvider>
-              <BranchProvider>
+        <BranchProvider>
+          <AuthProvider>
+            <PermissionProvider>
+              <LanguageProvider>
                 <SidebarProvider>
                   <CartProvider>
                     <ShiftProvider>
@@ -39,10 +39,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     </ShiftProvider>
                   </CartProvider>
                 </SidebarProvider>
-              </BranchProvider>
-            </LanguageProvider>
-          </PermissionProvider>
-        </AuthProvider>
+              </LanguageProvider>
+            </PermissionProvider>
+          </AuthProvider>
+        </BranchProvider>
       </body>
     </html>
   );
